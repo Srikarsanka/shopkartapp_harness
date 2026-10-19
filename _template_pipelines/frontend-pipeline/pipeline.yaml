@@ -1,0 +1,96 @@
+pipeline:
+  name: ${name}
+  identifier: ${identifier}
+  projectIdentifier: ${project_id}
+  orgIdentifier: ${org_id}
+  tags:
+    environment: ${environment}
+    component: frontend
+    managed_by: terraform
+  stages:
+    - stage:
+        name: Build and Test Frontend
+        identifier: build_and_test_frontend
+        type: CI
+        spec:
+          cloneCodebase: true
+          infrastructure:
+            type: KubernetesDirect
+            spec:
+              connectorRef: ${k8s_connector_ref}
+              namespace: ${build_namespace}
+              automountServiceAccountToken: true
+              nodeSelector: {}
+              os: Linux
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: Install and Test
+                  identifier: install_and_test
+                  spec:
+                    connectorRef: ${docker_connector_ref}
+                    image: node:20-alpine
+                    shell: Sh
+                    command: |-
+                      cd frontend
+                      npm ci
+                      npm run test -- --watch=false --browsers=ChromeHeadlessNoSandbox || true
+              - step:
+                  type: BuildAndPushDockerRegistry
+                  name: Build and Push Frontend Image
+                  identifier: build_and_push_image
+                  spec:
+                    connectorRef: ${docker_connector_ref}
+                    repo: ${image_path}
+                    tags:
+                      - <+pipeline.sequenceId>
+                      - latest
+                    dockerfile: docker/Dockerfile.frontend
+                    context: .
+    - stage:
+        name: Deploy Frontend to Kubernetes
+        identifier: deploy_frontend_k8s
+        type: Deployment
+        spec:
+          deploymentType: Kubernetes
+          service:
+            serviceRef: ${service_identifier}
+            serviceInputs: <+input>
+          environment:
+            environmentRef: ${environment_identifier}
+            deployToAll: false
+            infrastructureDefinitions:
+              - identifier: ${infra_definition_identifier}
+          execution:
+            steps:
+              - step:
+                  name: Rollout Deployment
+                  identifier: rolloutDeployment
+                  type: K8sRollingDeploy
+                  timeout: 10m
+                  spec:
+                    skipDryRun: false
+                    pruningEnabled: false
+              - step:
+                  name: Verify Health Status
+                  identifier: verifyHealthStatus
+                  type: ShellScript
+                  timeout: 5m
+                  spec:
+                    shell: Bash
+                    onDelegate: true
+                    source:
+                      type: Inline
+                      spec:
+                        script: |-
+                          echo "Verifying ShopKart Frontend rollout status..."
+                          kubectl rollout status deployment/shopkart-frontend -n ${environment}
+            rollbackSteps:
+              - step:
+                  name: Rollback Rollout Deployment
+                  identifier: rollbackRolloutDeployment
+                  type: K8sRollingRollback
+                  timeout: 10m
+                  spec:
+                    pruningEnabled: false

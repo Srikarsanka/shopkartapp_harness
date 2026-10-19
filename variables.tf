@@ -123,3 +123,62 @@ variable "artifact_tag" {
   type        = string
   default     = "latest"
 }
+
+# ==============================================================================
+# Service Overrides & Runtime Tuning Variables
+# ==============================================================================
+
+variable "backend_replica_count" {
+  description = "Number of backend pod replicas for the environment"
+  type        = number
+  default     = 2
+}
+
+variable "frontend_replica_count" {
+  description = "Number of frontend pod replicas for the environment"
+  type        = number
+  default     = 2
+}
+
+variable "backend_memory_limit" {
+  description = "Memory resource limit for backend pods"
+  type        = string
+  default     = "512Mi"
+}
+
+variable "backend_cpu_limit" {
+  description = "CPU resource limit for backend pods"
+  type        = string
+  default     = "500m"
+}
+
+variable "frontend_memory_limit" {
+  description = "Memory resource limit for frontend pods"
+  type        = string
+  default     = "256Mi"
+}
+
+variable "frontend_cpu_limit" {
+  description = "CPU resource limit for frontend pods"
+  type        = string
+  default     = "250m"
+}
+
+variable "backend_log_level" {
+  description = "Logging verbosity for backend Express service (debug, info, warn, error)"
+  type        = string
+  default     = "debug"
+}
+
+variable "mongodb_uri" {
+  description = "MongoDB connection string for ShopKart backend"
+  type        = string
+  sensitive   = true
+  default     = "mongodb://mongo:27017/shopkart"
+}
+
+variable "api_gateway_url" {
+  description = "Backend API URL consumed by frontend client"
+  type        = string
+  default     = "http://shopkart-backend:5000/api"
+}

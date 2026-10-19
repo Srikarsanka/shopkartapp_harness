@@ -1,67 +1,105 @@
 # ==============================================================================
-# Harness Infrastructure Resources - Outputs
+# Harness Infrastructure Resources - Outputs (outputs.tf)
 # ==============================================================================
 
-output "service_id" {
-  description = "The ID of the Harness Service"
-  value       = module.shopkart_service.id
+# ------------------------------------------------------------------------------
+# Frontend Microservice Outputs
+# ------------------------------------------------------------------------------
+
+output "frontend_service_id" {
+  description = "The ID of the Frontend Harness Service"
+  value       = module.frontend_service.id
 }
 
-output "service_identifier" {
-  description = "The unique identifier of the Harness Service"
-  value       = module.shopkart_service.identifier
+output "frontend_service_identifier" {
+  description = "The unique identifier of the Frontend Harness Service"
+  value       = module.frontend_service.identifier
 }
 
-output "pipeline_id" {
-  description = "The ID of the Harness Pipeline"
-  value       = module.shopkart_pipeline.id
+output "frontend_pipeline_id" {
+  description = "The ID of the Frontend Harness Pipeline"
+  value       = module.frontend_pipeline.id
 }
 
-output "pipeline_identifier" {
-  description = "The unique identifier of the Harness Pipeline"
-  value       = module.shopkart_pipeline.identifier
+output "frontend_pipeline_identifier" {
+  description = "The unique identifier of the Frontend Harness Pipeline"
+  value       = module.frontend_pipeline.identifier
 }
 
-output "input_set_id" {
-  description = "The ID of the Harness Input Set"
-  value       = module.shopkart_input_set.id
+output "frontend_inputset_id" {
+  description = "The ID of the Frontend Harness Input Set"
+  value       = module.frontend_inputset.id
 }
 
-output "input_set_identifier" {
-  description = "The unique identifier of the Harness Input Set"
-  value       = module.shopkart_input_set.identifier
+output "frontend_trigger_id" {
+  description = "The ID of the Frontend Harness Trigger"
+  value       = module.frontend_trigger.id
 }
 
-output "trigger_id" {
-  description = "The ID of the Harness Trigger"
-  value       = module.shopkart_trigger.id
+output "frontend_override_id" {
+  description = "The ID of the Frontend Harness Environment Service Override"
+  value       = module.frontend_override.id
 }
 
-output "trigger_identifier" {
-  description = "The unique identifier of the Harness Trigger"
-  value       = module.shopkart_trigger.identifier
+# ------------------------------------------------------------------------------
+# Backend Microservice Outputs
+# ------------------------------------------------------------------------------
+
+output "backend_service_id" {
+  description = "The ID of the Backend Harness Service"
+  value       = module.backend_service.id
 }
 
-# ==============================================================================
-# Rendered Templates (Allows offline inspection without live cloud credentials)
-# ==============================================================================
-
-output "rendered_service_yaml" {
-  description = "The fully rendered Service YAML submitted to Harness Platform"
-  value       = local.service_yaml
+output "backend_service_identifier" {
+  description = "The unique identifier of the Backend Harness Service"
+  value       = module.backend_service.identifier
 }
 
-output "rendered_pipeline_yaml" {
-  description = "The fully rendered Pipeline YAML submitted to Harness Platform"
-  value       = local.pipeline_yaml
+output "backend_pipeline_id" {
+  description = "The ID of the Backend Harness Pipeline"
+  value       = module.backend_pipeline.id
 }
 
-output "rendered_input_set_yaml" {
-  description = "The fully rendered Input Set YAML submitted to Harness Platform"
-  value       = local.input_set_yaml
+output "backend_pipeline_identifier" {
+  description = "The unique identifier of the Backend Harness Pipeline"
+  value       = module.backend_pipeline.identifier
 }
 
-output "rendered_trigger_yaml" {
-  description = "The fully rendered Trigger YAML submitted to Harness Platform"
-  value       = local.trigger_yaml
+output "backend_inputset_id" {
+  description = "The ID of the Backend Harness Input Set"
+  value       = module.backend_inputset.id
+}
+
+output "backend_trigger_id" {
+  description = "The ID of the Backend Harness Trigger"
+  value       = module.backend_trigger.id
+}
+
+output "backend_override_id" {
+  description = "The ID of the Backend Harness Environment Service Override"
+  value       = module.backend_override.id
+}
+
+# ------------------------------------------------------------------------------
+# Rendered YAML Outputs (Enables offline inspection of the data flow)
+# ------------------------------------------------------------------------------
+
+output "frontend_service_rendered_yaml" {
+  description = "Rendered YAML for Frontend Service"
+  value       = data.template_file.frontend_service_tmpl.rendered
+}
+
+output "backend_service_rendered_yaml" {
+  description = "Rendered YAML for Backend Service"
+  value       = data.template_file.backend_service_tmpl.rendered
+}
+
+output "frontend_pipeline_rendered_yaml" {
+  description = "Rendered YAML for Frontend Pipeline"
+  value       = data.template_file.frontend_pipeline_tmpl.rendered
+}
+
+output "backend_pipeline_rendered_yaml" {
+  description = "Rendered YAML for Backend Pipeline"
+  value       = data.template_file.backend_pipeline_tmpl.rendered
 }

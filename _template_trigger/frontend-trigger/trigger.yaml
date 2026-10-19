@@ -1,0 +1,30 @@
+trigger:
+  name: ${name}
+  identifier: ${identifier}
+  enabled: true
+  description: "Triggers ${pipeline_identifier} on push to ${branch} branch in ${repo_name}"
+  tags:
+    environment: ${environment}
+    component: frontend
+    managed_by: terraform
+  orgIdentifier: ${org_id}
+  projectIdentifier: ${project_id}
+  targetId: ${pipeline_identifier}
+  type: Webhook
+  spec:
+    type: Webhook
+    spec:
+      type: Github
+      spec:
+        connectorRef: ${connector_ref}
+        autoAbortPreviousExecutions: true
+        payloadConditions:
+          - key: targetBranch
+            operator: Equals
+            value: ${branch}
+        headerConditions:
+          - key: X-GitHub-Event
+            operator: Equals
+            value: push
+        repoName: ${repo_name}
+        actions: []

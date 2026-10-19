@@ -1,0 +1,29 @@
+inputSet:
+  name: ${name}
+  identifier: ${identifier}
+  orgIdentifier: ${org_id}
+  projectIdentifier: ${project_id}
+  tags:
+    environment: ${environment}
+    component: backend
+    managed_by: terraform
+  pipeline:
+    identifier: ${pipeline_identifier}
+    stages:
+      - stage:
+          identifier: deploy_backend_k8s
+          type: Deployment
+          spec:
+            service:
+              serviceInputs:
+                serviceDefinition:
+                  type: Kubernetes
+                  spec:
+                    artifacts:
+                      primary:
+                        primaryArtifactRef: <+input>
+                        sources:
+                          - spec:
+                              tag: ${artifact_tag}
+                            identifier: ${service_identifier}_image
+                            type: DockerRegistry

@@ -1,0 +1,45 @@
+service:
+  name: ${name}
+  identifier: ${identifier}
+  orgIdentifier: ${org_id}
+  projectIdentifier: ${project_id}
+  tags:
+    environment: ${environment}
+    tier: frontend
+    framework: angular
+    managed_by: terraform
+  serviceDefinition:
+    type: Kubernetes
+    spec:
+      manifests:
+        - manifest:
+            identifier: ${identifier}_manifest
+            type: K8sManifest
+            spec:
+              store:
+                type: Git
+                spec:
+                  connectorRef: ${connector_ref}
+                  gitFetchType: Branch
+                  paths:
+                    - k8s/frontend-deployment.yaml
+                    - k8s/frontend-service.yaml
+                  repoName: ${repo_name}
+                  branch: ${branch}
+      artifacts:
+        primary:
+          primaryArtifactRef: <+input>
+          sources:
+            - spec:
+                connectorRef: ${docker_connector_ref}
+                imagePath: ${image_path}
+                tag: <+input>
+              identifier: ${identifier}_image
+              type: DockerRegistry
+      variables:
+        - name: PORT
+          type: String
+          value: "80"
+        - name: API_URL
+          type: String
+          value: ${api_gateway_url}

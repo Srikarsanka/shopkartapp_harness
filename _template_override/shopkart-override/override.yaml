@@ -1,0 +1,19 @@
+serviceOverrides:
+  environmentRef: ${environment_identifier}
+  serviceRef: ${service_identifier}
+  variables:
+    - name: REPLICA_COUNT
+      type: String
+      value: "${replica_count}"
+    - name: MEMORY_LIMIT
+      type: String
+      value: "${memory_limit}"
+    - name: CPU_LIMIT
+      type: String
+      value: "${cpu_limit}"
+    - name: LOG_LEVEL
+      type: String
+      value: "${log_level}"
+    - name: CONFIG_ENDPOINT
+      type: String
+      value: "${config_endpoint}"
