@@ -63,45 +63,97 @@ When learning DevOps, terms like "manifest", "template", "module", and "state" c
 
 ```text
 shopkart-harness/
-├── _template_services/
-│   └── shopkart-service/
-│       └── service.yaml         # Blueprint for Harness Kubernetes Service & Artifact Source
-│
-├── _template_pipelines/
-│   └── shopkart-pipeline/
-│       └── pipeline.yaml        # Blueprint for multi-stage CI/CD pipeline
-│
 ├── _template_input_set/
+│   ├── backend-inputset/
+│   │   └── inputset.yaml        # Runtime input parameters for backend pipeline (artifact tags)
+│   ├── frontend-inputset/
+│   │   └── inputset.yaml       # Runtime input parameters for frontend pipeline (artifact tags)
 │   └── shopkart-input-set/
-│       └── inputset.yaml        # Blueprint for pipeline runtime values (tags, environment)
-│
+│       └── inputset.yaml        # Baseline demo input set template
+├── _template_override/
+│   └── shopkart-override/
+│       └── override.yaml        # Service overrides (CPU, memory, replicas, env vars per environment)
+├── _template_pipelines/
+│   ├── backend-pipeline/
+│   │   └── pipeline.yaml        # Backend CI/CD workflow (Node tests, Docker build, K8s deploy)
+│   ├── frontend-pipeline/
+│   │   └── pipeline.yaml       # Frontend CI/CD workflow (Angular tests, Docker build, K8s deploy)
+│   └── shopkart-pipeline/
+│       └── pipeline.yaml        # Baseline demo pipeline template
+├── _template_services/
+│   ├── backend-service/
+│   │   └── service.yaml         # Express.js Kubernetes service definition & artifact source
+│   ├── frontend-service/
+│   │   └── service.yaml        # Angular Nginx Kubernetes service definition & artifact source
+│   └── shopkart-service/
+│       └── service.yaml         # Baseline demo service template
 ├── _template_trigger/
+│   ├── backend-trigger/
+│   │   └── trigger.yaml         # GitHub webhook trigger targeting backend pipeline on push
+│   ├── frontend-trigger/
+│   │   └── trigger.yaml        # GitHub webhook trigger targeting frontend pipeline on push
 │   └── shopkart-trigger/
-│       └── trigger.yaml         # Blueprint for Git push webhook triggers
-│
+│       └── trigger.yaml         # Baseline demo trigger template
+├── docs/
+│   └── flow.md                  # Comprehensive end-to-end architecture & data flow documentation
 ├── environments/
-│   └── env_dev.tfvars           # Development environment parameter definitions
-│
+│   ├── dev.tfvars               # Development environment parameters (1 replica, debug logs)
+│   ├── env_dev.tfvars           # Baseline development parameter values
+│   ├── prod.tfvars              # Production environment parameters (HA replicas, warn logs, strict limits)
+│   └── qa.tfvars                # QA / Staging environment parameters (2 replicas, info logs)
 ├── modules/
-│   ├── services/                # Encapsulates harness_platform_service resource
-│   ├── pipelines/               # Encapsulates harness_platform_pipeline resource
-│   ├── input-sets/              # Encapsulates harness_platform_input_set resource
-│   └── triggers/                # Encapsulates harness_platform_triggers resource
-│
+│   ├── input-sets/
+│   │   ├── inputsets.tf         # Resource definition for harness_platform_input_set
+│   │   ├── main.tf              # Provider configuration requirements
+│   │   ├── outputs.tf           # Outputs: input set ID, identifier, and name
+│   │   └── variables.tf         # Input variables contract for input-sets module
+│   ├── overrides/
+│   │   ├── outputs.tf           # Outputs: override ID and identifier
+│   │   ├── overrides.tf         # Resource definition for harness_platform_environment_service_overrides
+│   │   └── variables.tf         # Input variables contract for overrides module
+│   ├── pipelines/
+│   │   ├── main.tf              # Provider configuration requirements
+│   │   ├── outputs.tf           # Outputs: pipeline ID, identifier, and name
+│   │   ├── pipelines.tf         # Resource definition for harness_platform_pipeline
+│   │   └── variables.tf         # Input variables contract for pipelines module
+│   ├── services/
+│   │   ├── main.tf              # Provider configuration requirements
+│   │   ├── outputs.tf           # Outputs: service ID, identifier, and name
+│   │   ├── services.tf          # Resource definition for harness_platform_service
+│   │   └── variables.tf         # Input variables contract for services module
+│   ├── templates/
+│   │   ├── templates.tf         # Reusable data.template_file rendering module
+│   │   └── variables.tf         # Input variables: template_path and template_vars
+│   └── triggers/
+│       ├── main.tf              # Provider configuration requirements
+│       ├── outputs.tf           # Outputs: trigger ID, identifier, and name
+│       ├── triggers.tf          # Resource definition for harness_platform_triggers
+│       └── variables.tf         # Input variables contract for triggers module
 ├── resources/
-│   ├── README.md                # Explains supporting architectural assets
+│   ├── README.md                # Explains supporting architectural assets and connectors
 │   └── sample-connectors.yaml   # Reference configuration for GitHub/Docker/K8s connectors
-│
-├── demo-service.tf              # Renders service template and calls services module
-├── demo-pipeline.tf             # Renders pipeline template and calls pipelines module
-├── demo-input-set.tf            # Renders input set template and calls input-sets module
-├── demo-trigger.tf              # Renders trigger template and calls triggers module
-├── variables.tf                 # Variable declarations, validation rules, and descriptions
-├── versions.tf                  # Declares Terraform >= 1.5.0 and harness provider >= 0.30
-├── providers.tf                 # Configures harness provider with credentials & gateway
-├── outputs.tf                   # Exposes resource IDs and fully rendered YAMLs for inspection
-├── .gitignore                   # Excludes state files, cache, and sensitive local tfvars
-└── README.md                    # This documentation file
+├── .gitignore                   # Excludes Terraform state files, cache, and sensitive local secrets
+├── .terraform.lock.hcl          # Provider dependency lockfile pinning provider versions
+├── architrcture.md              # Architectural notes and component descriptions
+├── backend-inputset.tf          # Renders backend-inputset template and provisions input-sets module
+├── backend-override.tf          # Renders backend override template and provisions overrides module
+├── backend-pipeline.tf          # Renders backend pipeline template and provisions pipelines module
+├── backend-service.tf           # Renders backend service template and provisions services module
+├── backend-trigger.tf           # Renders backend trigger template and provisions triggers module
+├── demo-input-set.tf            # Baseline demo input set configuration
+├── demo-pipeline.tf             # Baseline demo pipeline configuration
+├── demo-service.tf              # Baseline demo service configuration
+├── demo-trigger.tf              # Baseline demo trigger configuration
+├── frontend-inputset.tf         # Renders frontend-inputset template and provisions input-sets module
+├── frontend-override.tf         # Renders frontend override template and provisions overrides module
+├── frontend-pipeline.tf         # Renders frontend pipeline template and provisions pipelines module
+├── frontend-service.tf          # Renders frontend service template and provisions services module
+├── frontend-trigger.tf          # Renders frontend trigger template and provisions triggers module
+├── outputs.tf                   # Exposes all module IDs, identifiers, and fully rendered YAMLs
+├── providers.tf                 # Configures Harness provider with credentials, endpoint, and account ID
+├── README.md                    # Root repository documentation and architecture guide
+├── variables.tf                 # Variable declarations, validation rules, types, and defaults
+└── versions.tf                  # Required Terraform version (>= 1.5.0) and provider constraints
 ```
 
 ---
