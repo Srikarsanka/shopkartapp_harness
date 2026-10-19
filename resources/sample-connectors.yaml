@@ -1,0 +1,52 @@
+# ==============================================================================
+# Reference Only: Sample Harness Connectors (Account / Project Scope)
+# ==============================================================================
+# In a real enterprise Harness environment, Connectors are created once by
+# Platform Engineering or DevOps teams. The ShopKart pipeline references them
+# by identifier (e.g. `account.github_shopkart_connector`).
+
+---
+# 1. GitHub Codebase Connector
+connector:
+  name: GitHub ShopKart Connector
+  identifier: github_shopkart_connector
+  type: Github
+  spec:
+    type: Repo
+    url: https://github.com/example-user/shopkart-app
+    authentication:
+      type: Http
+      spec:
+        type: UsernameToken
+        spec:
+          username: example-user
+          tokenRef: account.github_personal_access_token
+    executeOnDelegate: true
+
+---
+# 2. Docker Registry Connector (Docker Hub or GHCR)
+connector:
+  name: Docker Registry Connector
+  identifier: docker_hub_connector
+  type: DockerReg
+  spec:
+    type: DockerHub
+    url: https://index.docker.io/v1/
+    authentication:
+      type: UsernamePassword
+      spec:
+        username: example-user
+        passwordRef: account.docker_hub_token
+    executeOnDelegate: true
+
+---
+# 3. Kubernetes Cluster Connector
+connector:
+  name: Kubernetes Dev Cluster
+  identifier: kubernetes_dev_cluster
+  type: K8sCluster
+  spec:
+    credential:
+      type: InheritFromDelegate
+    delegateSelectors:
+      - k8s-dev-delegate

@@ -1,0 +1,82 @@
+pipeline:
+  name: ${name}
+  identifier: ${identifier}
+  projectIdentifier: ${project_id}
+  orgIdentifier: ${org_id}
+  tags:
+    environment: ${environment}
+    managed_by: terraform
+    application: shopkart
+  description: "End-to-end CI/CD delivery pipeline for $${app_name:-shopkart} managed via Terraform"
+  stages:
+    - stage:
+        name: Build and Test
+        identifier: build_and_test
+        description: "Continuous Integration stage for ShopKart frontend and backend"
+        type: CI
+        spec:
+          cloneCodebase: true
+          infrastructure:
+            type: KubernetesDirect
+            spec:
+              connectorRef: ${k8s_connector_ref}
+              namespace: ${build_namespace}
+          execution:
+            steps:
+              - step:
+                  type: Run
+                  name: Run Backend Unit Tests
+                  identifier: backend_tests
+                  spec:
+                    connectorRef: ${docker_connector_ref}
+                    image: node:22-alpine
+                    shell: Sh
+                    command: |-
+                      echo "Running ShopKart backend test suite..."
+                      cd shopkart-app/backend
+                      npm ci
+                      npm test
+              - step:
+                  type: BuildAndPushDockerRegistry
+                  name: Build and Push Backend Image
+                  identifier: build_push_backend
+                  spec:
+                    connectorRef: ${docker_connector_ref}
+                    repo: ${backend_image_repo}
+                    tags:
+                      - <+pipeline.sequenceId>
+                      - latest
+                    dockerfile: shopkart-app/docker/Dockerfile.backend
+                    context: shopkart-app
+    - stage:
+        name: Deploy to Kubernetes
+        identifier: deploy_to_kubernetes
+        description: "Continuous Delivery stage rolling out to Kubernetes namespace"
+        type: Deployment
+        spec:
+          deploymentType: Kubernetes
+          service:
+            serviceRef: ${service_identifier}
+          environment:
+            environmentRef: ${environment_identifier}
+            infrastructureDefinitions:
+              - identifier: ${infra_definition_identifier}
+          execution:
+            steps:
+              - step:
+                  name: Rollout Deployment
+                  identifier: rollout_deployment
+                  type: K8sRollingDeploy
+                  timeout: 10m
+                  spec:
+                    skipDryRun: false
+                    pruningEnabled: false
+            rollbackSteps:
+              - step:
+                  name: Rollback Rollout Deployment
+                  identifier: rollback_rollout_deployment
+                  type: K8sRollingRollback
+                  timeout: 10m
+                  spec: {}
+        tags:
+          stage_env: ${environment}

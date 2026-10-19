@@ -1,0 +1,30 @@
+# Local .terraform directories
+**/.terraform/*
+
+# .tfstate files
+*.tfstate
+*.tfstate.*
+
+# Crash log files
+crash.log
+crash.*.log
+
+# Exclude all .tfvars files that might contain sensitive credentials
+# Except demo environment files specifically tracked for learning
+*.secret.tfvars
+terraform.tfvars
+secrets.tfvars
+
+# Ignore override files as they may contain local overrides
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Include fake test state directories
+.terraform.tfstate.lock.info
+
+# System and IDE files
+.DS_Store
+.idea/
+.vscode/

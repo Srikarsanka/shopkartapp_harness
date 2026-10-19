@@ -1,0 +1,35 @@
+service:
+  name: ${name}
+  identifier: ${identifier}
+  orgIdentifier: ${org_id}
+  projectIdentifier: ${project_id}
+  tags:
+    environment: ${environment}
+    managed_by: terraform
+    application: shopkart
+  serviceDefinition:
+    type: Kubernetes
+    spec:
+      manifests:
+        - manifest:
+            identifier: shopkart_k8s_manifests
+            type: K8sManifest
+            spec:
+              store:
+                type: Github
+                spec:
+                  connectorRef: ${connector_ref}
+                  gitFetchType: Branch
+                  paths:
+                    - k8s
+                  repoName: ${repo_name}
+                  branch: ${branch}
+      artifacts:
+        primary:
+          primaryArtifactRef: <+input>
+          sources:
+            - spec:
+                connectorRef: ${docker_connector_ref}
+                imagePath: ${image_path}
+                tag: <+input>
+              type: DockerRegistry

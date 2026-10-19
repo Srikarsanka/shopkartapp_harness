@@ -1,0 +1,24 @@
+trigger:
+  name: ${name}
+  identifier: ${identifier}
+  orgIdentifier: ${org_id}
+  projectIdentifier: ${project_id}
+  type: Webhook
+  targetId: ${target_id}
+  enabled: true
+  description: "Triggers ShopKart CI/CD pipeline on code push to main branch"
+  spec:
+    type: Github
+    spec:
+      connectorRef: ${connector_ref}
+      autoAbortPreviousExecutions: true
+      payloadConditions:
+        - key: targetBranch
+          operator: Equals
+          value: ${target_branch}
+      headerConditions: []
+      repoName: ${repo_name}
+      actions:
+        - ${trigger_action}
+    inputSetRefs:
+      - ${input_set_identifier}

@@ -1,0 +1,23 @@
+inputSet:
+  name: ${name}
+  identifier: ${identifier}
+  orgIdentifier: ${org_id}
+  projectIdentifier: ${project_id}
+  pipeline:
+    identifier: ${pipeline_identifier}
+    stages:
+      - stage:
+          identifier: deploy_to_kubernetes
+          type: Deployment
+          spec:
+            serviceConfig:
+              serviceDefinition:
+                type: Kubernetes
+                spec:
+                  artifacts:
+                    primary:
+                      tag: ${artifact_tag}
+  tags:
+    environment: ${environment}
+    managed_by: terraform
+    application: shopkart
